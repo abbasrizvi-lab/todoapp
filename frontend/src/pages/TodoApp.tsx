@@ -147,6 +147,9 @@ const TodoApp = () => {
     return true;
   });
 
+  const activeTasksCount = todos.filter(todo => !todo.completed).length;
+  const completedTasksCount = todos.filter(todo => todo.completed).length;
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-500 to-teal-600 p-4">
       <Card className="w-full max-w-2xl mt-8 shadow-xl rounded-xl animate-fade-in-up">
@@ -194,17 +197,27 @@ const TodoApp = () => {
             </Button>
           </form>
 
+          {/* Task Counts */}
+          <div className="flex justify-center gap-6 mb-6 text-gray-700 font-medium animate-fade-in">
+            <p className="flex items-center gap-2">
+              <CircleDot className="h-5 w-5 text-blue-500" /> Active: {activeTasksCount}
+            </p>
+            <p className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-500" /> Completed: {completedTasksCount}
+            </p>
+          </div>
+
           {/* Filter and Clear Completed */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 animate-fade-in">
             <ToggleGroup type="single" value={filter} onValueChange={(value: FilterType) => value && setFilter(value)} className="grid grid-cols-3 w-full sm:w-auto">
-              <ToggleGroupItem value="all" aria-label="Show all todos" className="flex-grow">
-                All
+              <ToggleGroupItem value="all" aria-label="Show all todos" className="flex-grow flex items-center gap-2">
+                <ListTodo className="h-4 w-4" /> All
               </ToggleGroupItem>
-              <ToggleGroupItem value="active" aria-label="Show active todos" className="flex-grow">
-                Active
+              <ToggleGroupItem value="active" aria-label="Show active todos" className="flex-grow flex items-center gap-2">
+                <CircleDot className="h-4 w-4" /> Active
               </ToggleGroupItem>
-              <ToggleGroupItem value="completed" aria-label="Show completed todos" className="flex-grow">
-                Completed
+              <ToggleGroupItem value="completed" aria-label="Show completed todos" className="flex-grow flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4" /> Completed
               </ToggleGroupItem>
             </ToggleGroup>
             <Button
@@ -239,7 +252,7 @@ const TodoApp = () => {
                   key={todo.id}
                   className={cn(
                     "flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 ease-in-out",
-                    todo.completed ? "opacity-70 bg-green-50 border-green-200" : "hover:shadow-md hover:border-blue-300",
+                    todo.completed ? "opacity-50 bg-green-50 border-green-200 scale-[0.98]" : "hover:shadow-md hover:border-blue-300",
                     "animate-fade-in-left"
                   )}
                 >
