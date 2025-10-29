@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { LogOut, Plus, Edit, Trash2, ListTodo } from "lucide-react"; // Added ListTodo icon
+import { LogOut, Plus, Edit, Trash2, ListTodo, CheckCircle2, CircleDot } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -30,6 +30,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
 interface TodoItem {
@@ -40,6 +41,8 @@ interface TodoItem {
   userId: string;
 }
 
+type FilterType = "all" | "active" | "completed";
+
 const TodoApp = () => {
   const { user, logout } = useAuth();
   const [todos, setTodos] = useState<TodoItem[]>([]);
@@ -48,6 +51,7 @@ const TodoApp = () => {
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [filter, setFilter] = useState<FilterType>("all");
 
   const userTodosKey = useMemo(() => `todos-${user?.id}`, [user?.id]);
 
@@ -132,6 +136,17 @@ const TodoApp = () => {
     toast.success("To-Do updated successfully!");
   };
 
+  const handleClearCompleted = () => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => !todo.completed));
+    toast.success("Completed To-Dos cleared!");
+  };
+
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
+    return true;
+  });
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-500 to-teal-600 p-4">
       <Card className="w-full max-w-2xl mt-8 shadow-xl rounded-xl animate-fade-in-up">
@@ -179,16 +194,47 @@ const TodoApp = () => {
             </Button>
           </form>
 
+          {/* Filter and Clear Completed */}
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 animate-fade-in">
+            <ToggleGroup type="single" value={filter} onValueChange={(value: FilterType) => value && setFilter(value)} className="grid grid-cols-3 w-full sm:w-auto">
+              <ToggleGroupItem value="all" aria-label="Show all todos" className="flex-grow">
+                All
+              </ToggleGroupItem>
+              <ToggleGroupItem value="active" aria-label="Show active todos" className="flex-grow">
+                Active
+              </ToggleGroupItem>
+              <ToggleGroupItem value="completed" aria-label="Show completed todos" className="flex-grow">
+                Completed
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <Button
+              variant="outline"
+              onClick={handleClearCompleted}
+              disabled={todos.filter(t => t.completed).length === 0}
+              className="w-full sm:w-auto flex items-center gap-2 text-gray-600 border-gray-300 hover:bg-gray-100 hover:text-gray-800 transition-all duration-300 ease-in-out"
+            >
+              <Trash2 className="h-4 w-4" /> Clear Completed
+            </Button>
+          </div>
+
           {/* To-Do List */}
           <div className="space-y-3">
-            {todos.length === 0 ? (
+            {filteredTodos.length === 0 ? (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500 animate-fade-in flex flex-col items-center gap-4">
                 <ListTodo className="h-12 w-12 text-gray-400" />
-                <p className="text-lg font-medium">No tasks yet! Your productivity journey starts here.</p>
-                <p className="text-sm text-gray-400">Add your first To-Do above to get started.</p>
+                <p className="text-lg font-medium">
+                  {filter === "all" && "No tasks yet! Your productivity journey starts here."}
+                  {filter === "active" && "No active tasks. Time to relax or add new ones!"}
+                  {filter === "completed" && "No completed tasks. Get to work!"}
+                </p>
+                <p className="text-sm text-gray-400">
+                  {filter === "all" && "Add your first To-Do above to get started."}
+                  {filter === "active" && "All tasks are completed or none exist."}
+                  {filter === "completed" && "Complete a task to see it here."}
+                </p>
               </div>
             ) : (
-              todos.map((todo) => (
+              filteredTodos.map((todo) => (
                 <div
                   key={todo.id}
                   className={cn(
