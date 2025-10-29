@@ -13,6 +13,7 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState(""); // New state for user's name
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -20,8 +21,8 @@ const Auth = () => {
     e.preventDefault();
 
     // Basic client-side validation
-    if (!email || !password) {
-      toast.error("Email and password are required.");
+    if (!email || !password || (!isLogin && !name)) { // Name is required for registration
+      toast.error("All fields are required.");
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
@@ -35,11 +36,9 @@ const Auth = () => {
 
     // Simulate authentication
     if (isLogin) {
-      // For simplicity, any non-empty email/password combination "logs in"
-      // In a real app, you'd check against stored credentials.
       const storedUsers = JSON.parse(localStorage.getItem("users") || "{}");
       if (storedUsers[email] && storedUsers[email].password === password) {
-        login(email, storedUsers[email].id);
+        login(email, storedUsers[email].id, storedUsers[email].name); // Pass name from stored user
         toast.success("Logged in successfully!");
         navigate("/todos");
       } else {
@@ -52,9 +51,9 @@ const Auth = () => {
         toast.error("User with this email already exists.");
       } else {
         const newUserId = `user-${Date.now()}`; // Simple unique ID
-        const newUser = { id: newUserId, email, password };
+        const newUser = { id: newUserId, email, password, name: name.trim() }; // Store name
         localStorage.setItem("users", JSON.stringify({ ...storedUsers, [email]: newUser }));
-        login(email, newUserId);
+        login(email, newUserId, name.trim()); // Pass name to login
         toast.success("Account created and logged in!");
         navigate("/todos");
       }
@@ -74,6 +73,20 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {!isLogin && ( // Show name input only for registration
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Your Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="mt-1"
+                />
+              </div>
+            )}
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -106,7 +119,13 @@ const Auth = () => {
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <Button
               variant="link"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                // Clear form fields when switching between login/register
+                setEmail("");
+                setPassword("");
+                setName("");
+              }}
               className="text-indigo-600 hover:text-indigo-800 p-0 h-auto"
             >
               {isLogin ? "Register" : "Login"}

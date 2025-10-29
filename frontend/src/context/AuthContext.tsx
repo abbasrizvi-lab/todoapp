@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  user: { id: string; email: string } | null;
-  login: (email: string, userId: string) => void;
+  user: { id: string; email: string; name: string } | null;
+  login: (email: string, userId: string, name: string) => void;
   logout: () => void;
 }
 
@@ -13,15 +13,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsLoggedIn(true);
+        // Ensure 'name' exists, provide a default if not for older stored users
+        if (parsedUser.id && parsedUser.email) {
+          setUser({ ...parsedUser, name: parsedUser.name || parsedUser.email.split('@')[0] });
+          setIsLoggedIn(true);
+        }
       } catch (error) {
         console.error("Failed to parse user from localStorage", error);
         localStorage.removeItem("user");
@@ -29,8 +32,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = (email: string, userId: string) => {
-    const newUser = { id: userId, email };
+  const login = (email: string, userId: string, name: string) => {
+    const newUser = { id: userId, email, name };
     setUser(newUser);
     setIsLoggedIn(true);
     localStorage.setItem("user", JSON.stringify(newUser));

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { LogOut, Plus, Edit, Trash2 } from "lucide-react";
+import { LogOut, Plus, Edit, Trash2, ListTodo } from "lucide-react"; // Added ListTodo icon
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -134,22 +134,25 @@ const TodoApp = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-500 to-teal-600 p-4">
-      <Card className="w-full max-w-2xl mt-8 shadow-xl animate-fade-in-up">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-3xl font-bold text-gray-800">
-            Hello, {user?.email || "Guest"}!
+      <Card className="w-full max-w-2xl mt-8 shadow-xl rounded-xl animate-fade-in-up">
+        <CardHeader className="flex flex-row items-center justify-between p-6 border-b">
+          <CardTitle className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+            <ListTodo className="h-8 w-8 text-blue-600" />
+            Hello, {user?.name || "Guest"}!
           </CardTitle>
           <Button onClick={logout} variant="outline" className="flex items-center gap-2 text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-300 ease-in-out">
             <LogOut className="h-4 w-4" />
             Logout
           </Button>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 mb-6">Manage your tasks efficiently.</p>
+        <CardContent className="p-6">
+          <p className="text-gray-600 mb-6 text-center">Manage your tasks efficiently and beautifully.</p>
 
           {/* Add New To-Do Form */}
-          <form onSubmit={handleAddTodo} className="space-y-4 mb-8 p-4 border rounded-lg shadow-sm bg-gray-50 animate-slide-in-down">
-            <h3 className="text-xl font-semibold text-gray-700">Add a New To-Do</h3>
+          <form onSubmit={handleAddTodo} className="space-y-4 mb-8 p-6 border border-blue-200 rounded-lg shadow-md bg-blue-50 animate-slide-in-down">
+            <h3 className="text-xl font-semibold text-blue-800 flex items-center gap-2">
+              <Plus className="h-5 w-5" /> Add a New To-Do
+            </h3>
             <div>
               <Label htmlFor="newTodoTitle" className="sr-only">To-Do Title</Label>
               <Input
@@ -157,7 +160,7 @@ const TodoApp = () => {
                 placeholder="What needs to be done?"
                 value={newTodoTitle}
                 onChange={(e) => setNewTodoTitle(e.target.value)}
-                className="w-full"
+                className="w-full border-blue-300 focus:border-blue-500 focus:ring-blue-500"
                 required
               />
             </div>
@@ -168,43 +171,45 @@ const TodoApp = () => {
                 placeholder="Add a description (optional)"
                 value={newTodoDescription}
                 onChange={(e) => setNewTodoDescription(e.target.value)}
-                className="w-full min-h-[60px]"
+                className="w-full min-h-[60px] border-blue-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            <Button type="submit" className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105">
+            <Button type="submit" className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105">
               <Plus className="h-4 w-4" /> Add To-Do
             </Button>
           </form>
 
           {/* To-Do List */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {todos.length === 0 ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500 animate-fade-in">
-                <p className="text-lg">No tasks yet! Add one above.</p>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500 animate-fade-in flex flex-col items-center gap-4">
+                <ListTodo className="h-12 w-12 text-gray-400" />
+                <p className="text-lg font-medium">No tasks yet! Your productivity journey starts here.</p>
+                <p className="text-sm text-gray-400">Add your first To-Do above to get started.</p>
               </div>
             ) : (
               todos.map((todo) => (
                 <div
                   key={todo.id}
                   className={cn(
-                    "flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-all duration-300 ease-in-out",
-                    todo.completed ? "opacity-60 line-through bg-green-50" : "hover:shadow-md",
-                    "animate-fade-in-left" // Animation for list items
+                    "flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 ease-in-out",
+                    todo.completed ? "opacity-70 bg-green-50 border-green-200" : "hover:shadow-md hover:border-blue-300",
+                    "animate-fade-in-left"
                   )}
                 >
-                  <div className="flex items-center space-x-3 flex-grow">
+                  <div className="flex items-start space-x-3 flex-grow">
                     <Checkbox
                       id={`todo-${todo.id}`}
                       checked={todo.completed}
                       onCheckedChange={() => handleToggleComplete(todo.id)}
-                      className="h-5 w-5"
+                      className="h-5 w-5 mt-1 border-blue-400 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                     />
-                    <div className="grid gap-1.5">
+                    <div className="grid gap-0.5">
                       <Label
                         htmlFor={`todo-${todo.id}`}
                         className={cn(
-                          "text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-                          todo.completed ? "text-gray-500" : "text-gray-800"
+                          "text-lg font-medium leading-none",
+                          todo.completed ? "text-gray-500 line-through" : "text-gray-800"
                         )}
                       >
                         {todo.title}
@@ -212,19 +217,19 @@ const TodoApp = () => {
                       {todo.description && (
                         <p className={cn(
                           "text-sm text-gray-500",
-                          todo.completed && "text-gray-400"
+                          todo.completed && "text-gray-400 line-through"
                         )}>
                           {todo.description}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEditTodo(todo)}
-                      className="text-blue-500 hover:bg-blue-50 transition-transform duration-200 ease-in-out hover:scale-110"
+                      className="text-blue-500 hover:bg-blue-100 transition-transform duration-200 ease-in-out hover:scale-110"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -233,7 +238,7 @@ const TodoApp = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-red-500 hover:bg-red-50 transition-transform duration-200 ease-in-out hover:scale-110"
+                          className="text-red-500 hover:bg-red-100 transition-transform duration-200 ease-in-out hover:scale-110"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
