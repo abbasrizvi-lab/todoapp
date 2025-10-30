@@ -67,7 +67,9 @@ const TodoApp = () => {
             throw new Error("Failed to fetch To-Dos.");
           }
           const data = await response.json();
+          console.log(`data is ${data}`)
           const todos = data.map((todo: any) => ({ ...todo, id: todo._id }));
+          console.log(`todosss ${todos}`)
           setTodos(todos);
         } catch (error) {
           toast.error((error as Error).message);
