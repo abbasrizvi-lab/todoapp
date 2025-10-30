@@ -75,6 +75,9 @@ const TodoApp = () => {
           toast.error((error as Error).message);
         }
       }
+      else{
+        console.log(`else block`)
+      }
     };
     fetchTodos();
   }, [user?.id, token]);

@@ -26,8 +26,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
+      console.log("AuthProvider: Session RESTORED.");
+    }
+    else{
+      console.log("AuthProvider: No session found. User is LOGGED OUT.");
     }
     setLoading(false);
+    console.log("AuthProvider: Loading complete (setLoading(false)).");
   }, []);
 
   const login = (user: { id: string; email: string; name: string }, token: string) => {

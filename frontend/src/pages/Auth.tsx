@@ -49,8 +49,6 @@ const Auth = () => {
         headers: { "Content-Type": "application/json" },
         body,
       });
-      console.log("👉 Fetching from:", url);
-
 
       const data = await response.json();
 

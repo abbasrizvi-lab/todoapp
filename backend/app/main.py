@@ -105,10 +105,12 @@ async def login(request: Request):
 
     access_token = create_access_token(data={"sub": user["email"]})
 
+    user["id"] = str(user["_id"])
+    user_out = UserOutSchema().dump(user)
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user": UserOutSchema().dump(user),
+        "user": user_out,
     }
 
 

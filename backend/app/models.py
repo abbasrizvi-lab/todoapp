@@ -7,6 +7,7 @@ class UserSchema(Schema):
     hashed_password = fields.Str(required=True, load_only=True)
 
 class UserInSchema(Schema):
+    id = fields.Str(data_key='_id', dump_only=True)
     name = fields.Str(required=True)
     email = fields.Email(required=True)
     password = fields.Str(required=True)
