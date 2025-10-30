@@ -67,10 +67,9 @@ const TodoApp = () => {
             throw new Error("Failed to fetch To-Dos.");
           }
           const data = await response.json();
-          console.log(`data is ${data}`)
-          const todos = data.map((todo: any) => ({ ...todo, id: todo._id }));
-          console.log(`todosss ${todos}`)
-          setTodos(todos);
+          console.log("Fetched todos data:", data);
+          const transformedTodos = data.map((todo: any) => ({ ...todo, id: todo._id }));
+          setTodos(transformedTodos);
         } catch (error) {
           toast.error((error as Error).message);
         }
@@ -107,6 +106,7 @@ const TodoApp = () => {
       }
 
       const newTodoData = await response.json();
+      console.log("New todo added:", newTodoData);
       const newTodo = { ...newTodoData, id: newTodoData._id };
       setTodos((prevTodos) => [...prevTodos, newTodo]);
       setNewTodoTitle("");
@@ -128,7 +128,7 @@ const TodoApp = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...todo, completed: !todo.completed }),
+        body: JSON.stringify({ title: todo.title, description: todo.description, completed: !todo.completed }),
       });
 
       if (!response.ok) {
@@ -136,9 +136,8 @@ const TodoApp = () => {
       }
 
       const updatedTodoData = await response.json();
-      const updatedTodo = { ...updatedTodoData, id: updatedTodoData._id };
       setTodos((prevTodos) =>
-        prevTodos.map((t) => (t.id === id ? updatedTodo : t))
+        prevTodos.map((t) => (t.id === id ? { ...updatedTodoData, id: updatedTodoData._id } : t))
       );
       toast.info("To-Do status updated!");
     } catch (error) {
@@ -185,9 +184,9 @@ const TodoApp = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...editingTodo,
           title: editTitle.trim(),
           description: editDescription.trim(),
+          completed: editingTodo.completed,
         }),
       });
 
@@ -197,7 +196,7 @@ const TodoApp = () => {
 
       const updatedTodo = await response.json();
       setTodos((prevTodos) =>
-        prevTodos.map((todo) => (todo.id === editingTodo.id ? updatedTodo : todo))
+        prevTodos.map((todo) => (todo.id === editingTodo.id ? { ...updatedTodo, id: updatedTodo._id } : todo))
       );
       setEditingTodo(null);
       toast.success("To-Do updated successfully!");
