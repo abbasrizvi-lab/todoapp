@@ -85,7 +85,13 @@ async def signup(request: Request):
     new_user = await app.mongodb.users.insert_one(user_data)
     created_user = await app.mongodb.users.find_one({"_id": new_user.inserted_id})
 
-    return UserOutSchema().dump(created_user)
+    access_token = create_access_token(data={"sub": created_user["email"]})
+    user_out = UserOutSchema().dump(created_user)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user_out,
+    }
 
 
 @auth_router.post("/login")

@@ -66,8 +66,8 @@ const Auth = () => {
       } else {
         console.log(data)
         console.log("API_BASE_URL:", API_BASE_URL);
-        const { access_token: token } = data;
-        const user = { name, email, id: data._id };
+        const { user: userData, access_token: token } = data;
+        const user = { ...userData, id: userData._id };
         login(user, token);
       }
       toast.success(isLogin ? "Logged in successfully!" : "Account created and logged in!");
