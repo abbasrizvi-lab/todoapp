@@ -8,7 +8,7 @@ from bson import ObjectId
 from contextlib import asynccontextmanager
 from marshmallow import ValidationError
 
-from src.models import (
+from .models import (
     UserSchema,
     UserInSchema,
     UserOutSchema,
@@ -17,7 +17,7 @@ from src.models import (
     TodoUpdateSchema,
     TodoOutSchema,
 )
-from src.security import (
+from .security import (
     get_password_hash,
     create_access_token,
     verify_password,
@@ -25,7 +25,7 @@ from src.security import (
 )
 from dotenv import load_dotenv
 from pathlib import Path
-from src.config import settings
+from .config import settings
 
 load_dotenv()
 
