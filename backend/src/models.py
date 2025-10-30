@@ -1,44 +1,41 @@
-from pydantic import BaseModel, Field, BeforeValidator
-from typing import Optional, Annotated
+from marshmallow import Schema, fields
 
-PyObjectId = Annotated[str, BeforeValidator(str)]
+class UserSchema(Schema):
+    id = fields.Str(data_key='_id', dump_only=True)
+    name = fields.Str(required=True)
+    email = fields.Email(required=True)
+    hashed_password = fields.Str(required=True, load_only=True)
 
-class User(BaseModel):
-    id: Optional[PyObjectId] = Field(alias='_id', default=None)
-    name: str
-    email: str
-    hashed_password: str
+class UserInSchema(Schema):
+    name = fields.Str(required=True)
+    email = fields.Email(required=True)
+    password = fields.Str(required=True)
 
-class UserIn(BaseModel):
-    name: str
-    email: str
-    password: str
+class UserOutSchema(Schema):
+    id = fields.Str(data_key='_id', required=True)
+    name = fields.Str(required=True)
+    email = fields.Email(required=True)
 
-class UserOut(BaseModel):
-    id: PyObjectId = Field(alias='_id')
-    name: str
-    email: str
+class LoginRequestSchema(Schema):
+    email = fields.Email(required=True)
+    password = fields.Str(required=True)
 
-class LoginRequest(BaseModel):
-    email: str
-    password: str
+class TokenSchema(Schema):
+    access_token = fields.Str(required=True)
+    token_type = fields.Str(required=True)
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+class TodoInSchema(Schema):
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
 
-class TodoIn(BaseModel):
-    title: str
-    description: str
+class TodoUpdateSchema(Schema):
+    title = fields.Str()
+    description = fields.Str()
+    completed = fields.Bool()
 
-class TodoUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    completed: Optional[bool] = None
-
-class TodoOut(BaseModel):
-    id: PyObjectId = Field(alias='_id')
-    title: str
-    description: str
-    completed: bool
-    user_id: str
+class TodoOutSchema(Schema):
+    id = fields.Str(data_key='_id', required=True)
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
+    completed = fields.Bool(required=True)
+    user_id = fields.Str(required=True)
