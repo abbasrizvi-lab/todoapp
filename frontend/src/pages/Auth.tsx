@@ -49,6 +49,8 @@ const Auth = () => {
         headers: { "Content-Type": "application/json" },
         body,
       });
+      console.log("👉 Fetching from:", url);
+
 
       const data = await response.json();
 
@@ -58,10 +60,14 @@ const Auth = () => {
 
       // Assuming the backend returns a user object and a token
       if (isLogin) {
+        console.log(data)
+        console.log("API_BASE_URL:", API_BASE_URL);
         const { user: userData, access_token: token } = data;
         const user = { ...userData, id: userData._id };
         login(user, token);
       } else {
+        console.log(data)
+        console.log("API_BASE_URL:", API_BASE_URL);
         const { access_token: token } = data;
         const user = { name, email, id: data._id };
         login(user, token);
@@ -69,6 +75,7 @@ const Auth = () => {
       toast.success(isLogin ? "Logged in successfully!" : "Account created and logged in!");
       navigate("/todos");
     } catch (error) {
+      console.log(error)
       toast.error((error as Error).message);
     }
   };
