@@ -8,7 +8,7 @@ from bson import ObjectId
 from contextlib import asynccontextmanager
 from marshmallow import ValidationError
 
-from backend.src.models import (
+from src.models import (
     UserSchema,
     UserInSchema,
     UserOutSchema,
@@ -17,7 +17,7 @@ from backend.src.models import (
     TodoUpdateSchema,
     TodoOutSchema,
 )
-from backend.src.security import (
+from src.security import (
     get_password_hash,
     create_access_token,
     verify_password,
