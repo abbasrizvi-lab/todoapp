@@ -54,11 +54,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # CORS configuration
-origins = settings.CORS_ORIGINS.split(",") if settings.CORS_ORIGINS else []
+# origins = settings.CORS_ORIGINS.split(",") if settings.CORS_ORIGINS else []
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -129,7 +129,13 @@ async def create_todo(request: Request, current_user: dict = Depends(get_current
     try:
         new_todo = await app.mongodb.todos.insert_one(todo_data)
         created_todo = await app.mongodb.todos.find_one({"_id": new_todo.inserted_id})
-        return TodoOutSchema().dump(created_todo)
+        return {
+            "_id": str(created_todo["_id"]),
+            "title": created_todo["title"],
+            "description": created_todo["description"],
+            "completed": created_todo["completed"],
+            "user_id": created_todo["user_id"],
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create todo: {e}")
 
@@ -140,7 +146,16 @@ async def get_todos(current_user: dict = Depends(get_current_user)):
         todos = (
             await app.mongodb.todos.find({"user_id": str(current_user["_id"])}).to_list(100)
         )
-        return TodoOutSchema(many=True).dump(todos)
+        return [
+            {
+                "_id": str(todo["_id"]),
+                "title": todo["title"],
+                "description": todo["description"],
+                "completed": todo["completed"],
+                "user_id": todo["user_id"],
+            }
+            for todo in todos
+        ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get todos: {e}")
 
@@ -167,7 +182,13 @@ async def update_todo(
             )
 
         updated_todo = await app.mongodb.todos.find_one({"_id": ObjectId(todo_id)})
-        return TodoOutSchema().dump(updated_todo)
+        return {
+            "_id": str(updated_todo["_id"]),
+            "title": updated_todo["title"],
+            "description": updated_todo["description"],
+            "completed": updated_todo["completed"],
+            "user_id": updated_todo["user_id"],
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update todo: {e}")
 
@@ -175,13 +196,11 @@ async def update_todo(
 @todo_router.delete("/{todo_id}", status_code=204)
 async def delete_todo(todo_id: str, current_user: dict = Depends(get_current_user)):
     try:
-        todo = await app.mongodb.todos.find_one(
+        result = await app.mongodb.todos.delete_one(
             {"_id": ObjectId(todo_id), "user_id": str(current_user["_id"])}
         )
-        if not todo:
+        if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Todo not found")
-
-        await app.mongodb.todos.delete_one({"_id": ObjectId(todo_id)})
         return
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete todo: {e}")

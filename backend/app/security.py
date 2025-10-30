@@ -12,8 +12,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 from dotenv import load_dotenv
 from pathlib import Path
 
-env_path = Path('.') / 'backend' / '.env'
-load_dotenv(dotenv_path=env_path)
+load_dotenv()
 
 SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
