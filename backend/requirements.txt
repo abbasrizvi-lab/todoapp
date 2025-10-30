@@ -3,6 +3,7 @@ uvicorn[standard]
 python-dotenv
 motor
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt==5.0.0
+passlib
 marshmallow
 gunicorn
