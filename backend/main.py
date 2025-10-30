@@ -25,6 +25,7 @@ from src.security import (
 )
 from dotenv import load_dotenv
 from pathlib import Path
+from src.config import settings
 
 load_dotenv()
 
@@ -53,9 +54,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # CORS configuration
+origins = settings.CORS_ORIGINS.split(",") if settings.CORS_ORIGINS else []
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
