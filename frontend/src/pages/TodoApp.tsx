@@ -59,6 +59,7 @@ const TodoApp = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       if (user?.id && token) {
+        console.log(token)
         try {
           const response = await fetch(API_URL, {
             headers: { Authorization: `Bearer ${token}` },
