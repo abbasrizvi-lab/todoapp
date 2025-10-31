@@ -79,7 +79,7 @@ async def signup(request: Request):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed_password = get_password_hash(user_in["password"])
-    user_data = {"name": user_in["name"], "email": user_in["email"], "hashed_password": hashed_password}
+    user_data = {"name": user_in["name"], "email": user_in["email"], "hashed_password": hashed_password.decode('utf-8')}
 
 
     new_user = await app.mongodb.users.insert_one(user_data)
@@ -105,7 +105,7 @@ async def login(request: Request):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if not verify_password(login_request["password"], user["hashed_password"]):
+    if not verify_password(login_request["password"], user["hashed_password"].encode('utf-8')):
         raise HTTPException(status_code=400, detail="Incorrect password")
     
 
